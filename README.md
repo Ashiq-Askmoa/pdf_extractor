@@ -23,12 +23,12 @@ This project provides tools to extract vector data (lines, rectangles, text) fro
 Use the `extract_vector_pdf_data.py` script to parse a PDF file.
 
 ```bash
-python3.11 extract_vector_pdf_data.py <path_to_pdf> [-o output.csv]
+python3 extract_vector_pdf_data.py <path_to_pdf> [-o output.csv]
 ```
 
 **Example:**
 ```bash
-python3.11 extract_vector_pdf_data.py sample_floor_plan.pdf
+python3 extract_vector_pdf_data.py sample_floor_plan.pdf
 ```
 This will generate `output_data.csv` containing the vector elements.
 
