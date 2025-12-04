@@ -139,7 +139,7 @@ def csv_to_pdf(csv_path, output_pdf):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Reconstruct PDF from CSV vector data.")
     parser.add_argument("csv_file", help="Path to the input CSV file")
-    parser.add_argument("--output", "-o", default="reconstructed.pdf", help="Path to the output PDF file")
+    parser.add_argument("--output", "-o", default="reconstructed_pdf.pdf", help="Path to the output PDF file")
     
     args = parser.parse_args()
     
