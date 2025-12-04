@@ -37,14 +37,14 @@ This will generate `output_data.csv` containing the vector elements.
 Use the `csv_to_pdf.py` script to generate a PDF from the CSV data.
 
 ```bash
-python3.11 csv_to_pdf.py <path_to_csv> [-o output.pdf]
+python3 csv_to_pdf.py <path_to_csv> [-o output.pdf]
 ```
 
 **Example:**
 ```bash
-python3.11 csv_to_pdf.py output_data.csv
+python3 csv_to_pdf.py output_data.csv
 ```
-This will create `reconstructed.pdf`.
+This will create `reconstructed_pdf.pdf`.
 
 ## CSV Structure
 
