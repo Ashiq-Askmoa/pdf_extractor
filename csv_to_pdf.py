@@ -122,7 +122,7 @@ def csv_to_pdf(csv_path, output_pdf):
                     except:
                         c.setFont("Helvetica", font_size)
                     
-                    # Draw text
+                    # Draw Text
                     # reportlab drawString takes (x, y) where y is baseline.
                     # We use y0 which is the bottom of the text bounding box.
                     c.drawString(x0, y0, text_content)
