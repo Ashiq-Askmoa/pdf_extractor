@@ -1,60 +1,88 @@
-# PDF Vector Data Extractor & Reconstructor
+# PDF Floor Plan Feature Extractor
 
-This project provides tools to extract vector data (lines, rectangles, text) from PDF files into CSV format, and conversely, reconstruct PDF files from that CSV data. This is particularly useful for analyzing or modifying 2D design layouts like floor plans.
+This project provides a suite of Python tools to extract, quantify, and visualize architectural features (Walls, Doors, Windows, Sanitary Fixtures) from vector-based Floor Plan PDFs.
 
-## Features
+It differs from standard OCR tools by using **Geometric Heuristics** and **Vector Analysis** to identify features even when standard PDF layers (OCGs) are missing or unstructured.
 
-- **Extraction**: Extracts lines, rectangles, and text with their properties (coordinates, color, font, size) from a PDF.
-- **Reconstruction**: Generates a PDF file from the extracted CSV data, preserving the layout and vector elements.
-- **Coordinate Standardization**: Handles coordinate system differences between PDF libraries to ensure correct placement (Bottom-Left origin).
+## Key Features
 
-## Installation
+*   **Geometric Classification**: Identifies features based on line width, shape (curves vs. lines), and connectivity.
+    *   **Walls**: Thick lines ($\ge$ 0.70 units).
+    *   **Windows**: Thin detailed lines (< 0.25 units).
+    *   **Doors**: Intelligent detection connecting Swing Arcs + Door Leaf Lines + Text Labels.
+    *   **Sanitary**: Detects Basins (small geometric loops) and WCs (text labels).
+*   **Text Extraction**: captures all text and specific labels (Room Names, Appliance Codes).
+*   **Layer Regeneration**: Can re-draw specific features onto clean new PDFs.
 
-1.  **Prerequisites**: Python 3.11 or higher.
-2.  **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
+## Prerequisites
 
-## Usage
+*   Python 3.8+
+*   Virtual Environment (Recommended)
 
-### 1. Extract Vector Data (PDF to CSV)
-
-Use the `extract_vector_pdf_data.py` script to parse a PDF file.
-
+### Dependencies
+Install the required packages:
 ```bash
-python3 extract_vector_pdf_data.py <path_to_pdf> [-o output.csv]
+pip install pymupdf pandas openpyxl
 ```
 
-**Example:**
+## Scripts & Usage
+
+### 1. Main Feature Extraction
+**Script:** `extract_pdf_data.py`
+
+Analyzes the PDF and generates a comprehensive Excel report.
+
+*   **Output:** `blueprint_quantities.xlsx`
+    *   **Summary**: Aggregated counts and lengths.
+    *   **Detailed Features**: A list of >80,000 extracted items with Bounding Box coordinates.
+    *   **All Text**: Complete text dump.
+
 ```bash
-python3 extract_vector_pdf_data.py sample_floor_plan.pdf
+python3 extract_pdf_data.py
 ```
-This will generate `output_data.csv` containing the vector elements.
 
-### 2. Reconstruct PDF (CSV to PDF)
+### 2. Layer Separation (Excel)
+**Script:** `extract_layers.py`
 
-Use the `csv_to_pdf.py` script to generate a PDF from the CSV data.
+Organizes the extracted data into separate Excel sheets for easier manual review.
+
+*   **Output:** `separated_quantities.xlsx`
+    *   Contains individual tabs for `Wall`, `Door`, `Window_Detail`, `Sanitary`, etc.
 
 ```bash
-python3 csv_to_pdf.py <path_to_csv> [-o output.pdf]
+python3 extract_layers.py
 ```
 
-**Example:**
+### 3. Layer Visualization (PDF Generator)
+**Script:** `generate_layer_pdf.py`
+
+Re-draws the extracted geometry onto new, clean PDF files. This is useful for visually verifying what the script has detected.
+
+*   **Features:**
+    *   **Intelligent Door Binding**: Automatically links independent arc and line segments to reconstruct full doors.
+    *   **Visibility Enhancement**: Enforces minimum line widths so thin features remain visible.
+*   **Output Directory:** `generated_layers/`
+    *   `layer_Wall.pdf`
+    *   `layer_Door.pdf`
+    *   `layer_Sanitary_Basin.pdf`
+    *   ...and more.
+
 ```bash
-python3 csv_to_pdf.py output_data.csv
+python3 generate_layer_pdf.py
 ```
-This will create `reconstructed_pdf.pdf`.
 
-## CSV Structure
+## Heuristics Configuration
 
-The output CSV contains the following columns:
-- `page_number`: Page number (1-based).
-- `element_type`: Type of element (`line`, `rect`, `text`, `curve`).
-- `x0`, `y0`, `x1`, `y1`: Bounding box or start/end coordinates (PDF Bottom-Left origin).
-- `properties`: JSON string containing additional attributes like color, stroke width, font name, and text content.
+The classification logic is consistent across all scripts. Key thresholds (in PDF units):
 
-## Notes
+*   **Wall Threshold**: Width $\ge$ 0.70
+*   **Window Threshold**: Width < 0.25 (and > 0)
+*   **Door Detection**:
+    *   **Geometry**: Curve/Arc segments. straight lines touching arcs are promoted to "Door".
+    *   **Text**: Labels starting with `D-`, `HVD-`, `VVD-`, `YDS-` or containing `BASTUDÖRR`.
+*   **Basin Detection**: Closed geometric loops with perimeter between 10-200 units.
 
-- The extraction script standardizes text coordinates to the PDF standard (Bottom-Left origin) to ensure compatibility with the reconstruction script and other PDF tools.
-- If you encounter `ModuleNotFoundError`, ensure you are running the script with the python version where dependencies were installed (e.g., `python3.11`).
+## Troubleshooting
+
+*   **"No module named fitz"**: Ensure you installed `pymupdf` (not `fitz`).
+*   **Invisible Output in PDF**: The `generate_layer_pdf.py` script automatically boosts line width to 0.5. If features are still missing, check the `analyze_widths.py` tool (if available) to see the distribution of line weights in your specific PDF.
