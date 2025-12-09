@@ -17,12 +17,20 @@ It differs from standard OCR tools by using **Geometric Heuristics** and **Vecto
 ## Prerequisites
 
 *   Python 3.8+
-*   Virtual Environment (Recommended)
+*   Virtual Environment
 
 ### Dependencies
+Install Virtual Environment and activate it:
+
+```bash
+python3 -m venv venv
+```
+```bash
+source venv/bin/activate
+```
 Install the required packages:
 ```bash
-pip install pymupdf pandas openpyxl
+pip install -r requirements.txt
 ```
 
 ## Scripts & Usage
